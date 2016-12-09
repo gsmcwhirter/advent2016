@@ -11,6 +11,7 @@ import (
 	"github.com/gsmcwhirter/adventofcode/day6"
 	"github.com/gsmcwhirter/adventofcode/day7"
 	"github.com/gsmcwhirter/adventofcode/day8"
+	"github.com/gsmcwhirter/adventofcode/day9"
 )
 
 func main() {
@@ -50,6 +51,10 @@ func main() {
 		day8.RunPartA(filename)
 	case "8b":
 		day8.RunPartB(filename)
+	case "9a":
+		day9.RunPartA(filename)
+	case "9b":
+		day9.RunPartB(filename)
 	}
 
 }
