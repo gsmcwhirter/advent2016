@@ -3,15 +3,17 @@ package main
 import (
 	"os"
 
-	"github.com/gsmcwhirter/adventofcode/day1"
-	"github.com/gsmcwhirter/adventofcode/day2"
-	"github.com/gsmcwhirter/adventofcode/day3"
-	"github.com/gsmcwhirter/adventofcode/day4"
-	"github.com/gsmcwhirter/adventofcode/day5"
-	"github.com/gsmcwhirter/adventofcode/day6"
-	"github.com/gsmcwhirter/adventofcode/day7"
-	"github.com/gsmcwhirter/adventofcode/day8"
-	"github.com/gsmcwhirter/adventofcode/day9"
+	"github.com/gsmcwhirter/advent2016/day1"
+	"github.com/gsmcwhirter/advent2016/day10"
+	"github.com/gsmcwhirter/advent2016/day11"
+	"github.com/gsmcwhirter/advent2016/day2"
+	"github.com/gsmcwhirter/advent2016/day3"
+	"github.com/gsmcwhirter/advent2016/day4"
+	"github.com/gsmcwhirter/advent2016/day5"
+	"github.com/gsmcwhirter/advent2016/day6"
+	"github.com/gsmcwhirter/advent2016/day7"
+	"github.com/gsmcwhirter/advent2016/day8"
+	"github.com/gsmcwhirter/advent2016/day9"
 )
 
 func main() {
@@ -55,6 +57,14 @@ func main() {
 		day9.RunPartA(filename)
 	case "9b":
 		day9.RunPartB(filename)
+	case "10a":
+		day10.RunPartA(filename)
+	case "10b":
+		day10.RunPartB(filename)
+	case "11a":
+		day11.RunPartA(filename)
+	case "11b":
+		day11.RunPartB(filename)
 	}
 
 }
