@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/gsmcwhirter/adventofcode/lib"
+	"github.com/gsmcwhirter/advent2016/lib"
 )
 
 type Delta struct {

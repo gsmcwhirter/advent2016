@@ -24,4 +24,5 @@ _testmain.go
 *.prof
 
 adventofcode
+advent2016
 .vscode

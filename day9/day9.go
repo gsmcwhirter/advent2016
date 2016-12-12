@@ -8,7 +8,7 @@ import (
 
 	"strconv"
 
-	"github.com/gsmcwhirter/adventofcode/lib"
+	"github.com/gsmcwhirter/advent2016/lib"
 )
 
 func DecompressSize(inStr string, recursive bool) int {

@@ -19,6 +19,22 @@ func ReadFileData(filename string) string {
 	return string(dat)
 }
 
+func IntMax(a int, b int) int {
+	if a >= b {
+		return a
+	}
+
+	return b
+}
+
+func IntMin(a int, b int) int {
+	if a <= b {
+		return a
+	}
+
+	return b
+}
+
 func IntAbs(val int) int {
 	return int(math.Abs(float64(val)))
 }

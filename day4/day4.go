@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gsmcwhirter/adventofcode/lib"
+	"github.com/gsmcwhirter/advent2016/lib"
 )
 
 type Room struct {
