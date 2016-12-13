@@ -142,6 +142,45 @@ func (f *Floor) ChipTypes(excepts ...string) []string {
 	return types
 }
 
+func (f *Floor) NumPairs() int {
+	gens := f.GeneratorTypes("")
+
+	count := 0
+	for _, gen := range gens {
+		if f.HasChip(gen) {
+			count++
+		}
+	}
+
+	return count
+}
+
+func (f *Floor) NumUnpairedChips() int {
+	chips := f.ChipTypes("")
+
+	count := 0
+	for _, chip := range chips {
+		if !f.HasGenerator(chip) {
+			count++
+		}
+	}
+
+	return count
+}
+
+func (f *Floor) NumUnpairedGenerators() int {
+	gens := f.GeneratorTypes("")
+
+	count := 0
+	for _, gen := range gens {
+		if !f.HasChip(gen) {
+			count++
+		}
+	}
+
+	return count
+}
+
 type State struct {
 	Elevator  int
 	Floors    []Floor
@@ -302,9 +341,35 @@ func (s *State) Equal(other State) bool {
 	return true
 }
 
+func (s *State) Isomorphic(other State) bool {
+	if s.Elevator != other.Elevator {
+		return false
+	}
+
+	for i, sflr := range s.Floors {
+		oflr := other.Floors[i]
+
+		if len(sflr.Pieces) != len(oflr.Pieces) {
+			return false
+		}
+
+		if sflr.NumPairs() != oflr.NumPairs() {
+			return false
+		}
+
+		if sflr.NumUnpairedChips() != oflr.NumUnpairedChips() {
+			return false
+		}
+
+		// don't need to check unpaired generators at this point -- they must match
+	}
+
+	return true
+}
+
 func StateInHistory(history []State, ns State) bool {
 	for _, oldS := range history {
-		if oldS.Equal(ns) {
+		if oldS.Isomorphic(ns) { // was Equal
 			return true
 		}
 	}
