@@ -189,22 +189,24 @@ type State struct {
 }
 
 func (s *State) GenerateMoves(history []State) []Move {
-	moves := []Move{}
+	movesUp := []Move{}
+	movesDown := []Move{}
+
+	minFloor := 1
+
+	for i := 0; i < 4; i++ {
+		if len(s.Floors[i].Pieces) == 0 {
+			minFloor++
+		} else {
+			break
+		}
+	}
 
 	floor := s.Floors[s.Elevator-1]
 
 	var move Move
+
 	for i, piece := range floor.Pieces {
-		move = Move{s.Elevator + 1, []Piece{piece}}
-		if s.MoveIsValid(move, history) {
-			moves = append(moves, move)
-		}
-
-		move = Move{s.Elevator - 1, []Piece{piece}}
-		if s.MoveIsValid(move, history) {
-			moves = append(moves, move)
-		}
-
 		for j, piece2 := range floor.Pieces {
 			if i == j {
 				continue
@@ -212,17 +214,44 @@ func (s *State) GenerateMoves(history []State) []Move {
 
 			move = Move{s.Elevator + 1, []Piece{piece, piece2}}
 			if s.MoveIsValid(move, history) {
-				moves = append(moves, move)
+				movesUp = append(movesUp, move)
 			}
+		}
 
-			move = Move{s.Elevator - 1, []Piece{piece, piece2}}
+		if s.Elevator > minFloor {
+			move = Move{s.Elevator - 1, []Piece{piece}}
 			if s.MoveIsValid(move, history) {
-				moves = append(moves, move)
+				movesDown = append(movesDown, move)
+			}
+		}
+
+	}
+
+	for i, piece := range floor.Pieces {
+		if len(movesUp) == 0 {
+			move = Move{s.Elevator + 1, []Piece{piece}}
+			if s.MoveIsValid(move, history) {
+				movesUp = append(movesUp, move)
+			}
+		}
+
+		if len(movesDown) == 0 {
+			for j, piece2 := range floor.Pieces {
+				if i == j {
+					continue
+				}
+
+				if s.Elevator > minFloor {
+					move = Move{s.Elevator - 1, []Piece{piece, piece2}}
+					if s.MoveIsValid(move, history) {
+						movesDown = append(movesDown, move)
+					}
+				}
 			}
 		}
 	}
 
-	return moves
+	return append(movesUp, movesDown...)
 }
 
 func (s *State) MoveIsValid(move Move, history []State) bool {
@@ -462,12 +491,19 @@ func BFS(startState State) {
 		queue.push(move, state)
 	}
 
+	lastMoveCount := 0
+
 	item := queue.pop()
 	var newState State
 	for item != nil {
 		// fmt.Println(item.Move)
 		newState = AdvanceState(item.State, item.Move)
 		// newState.Print()
+
+		if newState.MoveCount > lastMoveCount {
+			lastMoveCount = newState.MoveCount
+			fmt.Printf("Considering states %v moves out\n", lastMoveCount)
+		}
 
 		if StateInHistory(history, newState) {
 			// fmt.Println("Skipping state")
