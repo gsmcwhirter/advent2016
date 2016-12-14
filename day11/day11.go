@@ -63,7 +63,8 @@ func (f *Floor) Equal(other Floor) bool {
 		return false
 	}
 
-	for _, piece := range append(f.Pieces, other.Pieces...) {
+	allPieces := append(f.Pieces, other.Pieces...)
+	for _, piece := range allPieces {
 		if !f.HasPiece(piece) || !other.HasPiece(piece) {
 			return false
 		}
@@ -192,15 +193,15 @@ func (s *State) GenerateMoves(history []State) []Move {
 	movesUp := []Move{}
 	movesDown := []Move{}
 
-	minFloor := 1
+	// minFloor := 0
 
-	for i := 0; i < 4; i++ {
-		if len(s.Floors[i].Pieces) == 0 {
-			minFloor++
-		} else {
-			break
-		}
-	}
+	// for i := 0; i < 4; i++ {
+	// 	if len(s.Floors[i].Pieces) == 0 {
+	// 		minFloor++
+	// 	} else {
+	// 		break
+	// 	}
+	// }
 
 	floor := s.Floors[s.Elevator-1]
 
@@ -208,7 +209,7 @@ func (s *State) GenerateMoves(history []State) []Move {
 
 	for i, piece := range floor.Pieces {
 		for j, piece2 := range floor.Pieces {
-			if i == j {
+			if i <= j {
 				continue
 			}
 
@@ -218,40 +219,46 @@ func (s *State) GenerateMoves(history []State) []Move {
 			}
 		}
 
-		if s.Elevator > minFloor {
-			move = Move{s.Elevator - 1, []Piece{piece}}
-			if s.MoveIsValid(move, history) {
-				movesDown = append(movesDown, move)
-			}
+		// if s.Elevator > minFloor {
+		move = Move{s.Elevator - 1, []Piece{piece}}
+		if s.MoveIsValid(move, history) {
+			movesDown = append(movesDown, move)
 		}
+		// }
 
 	}
 
+	onePieceUp := len(movesUp) == 0 || true
+	twoPieceDown := len(movesDown) == 0 || true
+
 	for i, piece := range floor.Pieces {
-		if len(movesUp) == 0 {
+		if onePieceUp {
 			move = Move{s.Elevator + 1, []Piece{piece}}
 			if s.MoveIsValid(move, history) {
 				movesUp = append(movesUp, move)
 			}
 		}
 
-		if len(movesDown) == 0 {
+		if twoPieceDown {
 			for j, piece2 := range floor.Pieces {
-				if i == j {
+				if i <= j {
 					continue
 				}
 
-				if s.Elevator > minFloor {
-					move = Move{s.Elevator - 1, []Piece{piece, piece2}}
-					if s.MoveIsValid(move, history) {
-						movesDown = append(movesDown, move)
-					}
+				// if s.Elevator > minFloor {
+				move = Move{s.Elevator - 1, []Piece{piece, piece2}}
+				if s.MoveIsValid(move, history) {
+					movesDown = append(movesDown, move)
 				}
+				// }
 			}
 		}
 	}
 
-	return append(movesUp, movesDown...)
+	moves := append(movesUp, movesDown...)
+	// fmt.Println(moves)
+
+	return moves
 }
 
 func (s *State) MoveIsValid(move Move, history []State) bool {
@@ -293,8 +300,9 @@ func (s *State) MoveIsValid(move Move, history []State) bool {
 	}
 
 	// Will we fry something on the target floor?
-	for _, gen := range moveGenerators {
-		if len(targetFloor.ChipTypes(gen)) > 0 {
+	targetFloorOtherChips := targetFloor.ChipTypes(moveGenerators...)
+	for _, chip := range targetFloorOtherChips {
+		if !targetFloor.HasGenerator(chip) {
 			return false
 		}
 	}
@@ -370,35 +378,82 @@ func (s *State) Equal(other State) bool {
 	return true
 }
 
+func (s *State) IsoState() [][2]int {
+	isoState := make([][2]int, len(s.Elements))
+	for i, elem := range s.Elements {
+		isoState[i] = [2]int{-1, -1}
+		for j, floor := range s.Floors {
+			if floor.HasGenerator(elem) {
+				isoState[i][0] = j
+			}
+
+			if floor.HasChip(elem) {
+				isoState[i][1] = j
+			}
+		}
+	}
+
+	// fmt.Println(isoState)
+
+	return isoState
+}
+
 func (s *State) Isomorphic(other State) bool {
 	if s.Elevator != other.Elevator {
 		return false
 	}
 
-	for i, sflr := range s.Floors {
-		oflr := other.Floors[i]
+	isoState1 := s.IsoState()
+	isoState2 := other.IsoState()
 
-		if len(sflr.Pieces) != len(oflr.Pieces) {
-			return false
+	for _, s1 := range isoState1 {
+		existsInOther := false
+		for _, s2 := range isoState2 {
+			if s1[0] == s2[0] && s1[1] == s2[1] {
+				existsInOther = true
+				break
+			}
 		}
 
-		if sflr.NumPairs() != oflr.NumPairs() {
+		if !existsInOther {
+			// fmt.Printf("%v !~= %v\n", isoState1, isoState2)
 			return false
 		}
-
-		if sflr.NumUnpairedChips() != oflr.NumUnpairedChips() {
-			return false
-		}
-
-		// don't need to check unpaired generators at this point -- they must match
 	}
 
+	// for _, s1 := range isoState2 {
+	// 	existsInOther := false
+
+	// 	for _, s2 := range isoState1 {
+	// 		if s1[0] == s2[0] && s1[1] == s2[1] {
+	// 			existsInOther = true
+	// 			break
+	// 		}
+	// 	}
+
+	// 	if !existsInOther {
+	// 		fmt.Printf("%v !~= %v\n", isoState1, isoState2)
+	// 		return false
+	// 	}
+	// }
+
+	// fmt.Printf("%v ~= %v\n", isoState1, isoState2)
 	return true
+}
+
+func (s *State) NumPieces() int {
+	count := 0
+
+	for _, floor := range s.Floors {
+		count += len(floor.Pieces)
+	}
+
+	return count
 }
 
 func StateInHistory(history []State, ns State) bool {
 	for _, oldS := range history {
-		if oldS.Isomorphic(ns) { // was Equal
+		if oldS.Equal(ns) { // was Equal
 			return true
 		}
 	}
@@ -410,36 +465,53 @@ func AdvanceState(oldState State, move Move) State {
 	// oldState.Print()
 
 	newFloors := []Floor{}
+	// fmt.Println("\n")
+	// oldState.Print()
+	// fmt.Printf("Move Applied: %+v\n", move)
 
 	for i, floor := range oldState.Floors {
-		// fmt.Print(i, " ")
-		// fmt.Println(floor)
+		newPieces := []Piece{}
+		// fmt.Print("Floor Index:", i, " ")
+		// fmt.Printf("Floor: %+v\n", floor)
 		switch i + 1 {
 		case oldState.Elevator:
 			// fmt.Println("Cleaning out old floor")
-			newPieces := []Piece{}
 			for _, piece := range floor.Pieces {
 				if !move.HasPiece(piece) {
 					newPieces = append(newPieces, piece)
 				}
 			}
 
-			newFloors = append(newFloors, Floor{
+			newFloor := Floor{
 				Num:    floor.Num,
 				Pieces: newPieces,
-			})
+			}
+			// fmt.Printf("Result: %+v\n", newFloor)
+
+			newFloors = append(newFloors, newFloor)
 		case move.TargetFloor:
 			// fmt.Println("Creating new floor")
-			newFloors = append(newFloors, Floor{
+
+			newPieces = append(newPieces, floor.Pieces...)
+			newPieces = append(newPieces, move.Pieces...)
+
+			newFloor := Floor{
 				Num:    floor.Num,
-				Pieces: append(floor.Pieces[:], move.Pieces...),
-			})
+				Pieces: newPieces,
+			}
+			// fmt.Printf("Result: %+v\n", newFloor)
+
+			newFloors = append(newFloors, newFloor)
 		default:
 			// fmt.Println("Floor unchanged")
-			newFloors = append(newFloors, Floor{
+
+			newFloor := Floor{
 				Num:    floor.Num,
-				Pieces: floor.Pieces[:],
-			})
+				Pieces: append(newPieces, floor.Pieces...),
+			}
+			// fmt.Printf("Result: %+v\n", newFloor)
+
+			newFloors = append(newFloors, newFloor)
 		}
 	}
 
@@ -448,6 +520,16 @@ func AdvanceState(oldState State, move Move) State {
 		Floors:    newFloors,
 		Elements:  oldState.Elements,
 		MoveCount: oldState.MoveCount + 1,
+	}
+
+	if oldState.NumPieces() != newState.NumPieces() {
+		fmt.Println("ERROR! Lost Pieces!")
+		oldState.Print()
+		fmt.Printf("Move Applied: %+v\n", move)
+		panic("Quitting")
+	} else {
+		// newState.Print()
+		// fmt.Println("-----------------------------")
 	}
 
 	// newState.Print()
@@ -486,7 +568,7 @@ func BFS(startState State) {
 	history := []State{state}
 
 	newMoves := state.GenerateMoves(history)
-	// fmt.Printf("Adding %v moves to the queue (current length %v)\n", len(newMoves), len(newMoves)+len(queue.Items))
+	fmt.Printf("Adding %v moves to the queue (current length %v)\n", len(newMoves), len(newMoves)+len(queue.Items))
 	for _, move := range newMoves {
 		queue.push(move, state)
 	}
@@ -519,7 +601,7 @@ func BFS(startState State) {
 		}
 
 		newMoves := newState.GenerateMoves(history)
-		// fmt.Printf("Adding %v moves to the queue (current length %v)\n", len(newMoves), len(newMoves)+len(queue.Items))
+		fmt.Printf("Adding %v moves to the queue (current length %v)\n", len(newMoves), len(newMoves)+len(queue.Items))
 		for _, move := range newMoves {
 			queue.push(move, newState)
 		}
@@ -589,6 +671,8 @@ func RunPartA(filename string) {
 		Elements:  allTypes,
 		MoveCount: 0,
 	}
+
+	state.Print()
 
 	BFS(state)
 }
