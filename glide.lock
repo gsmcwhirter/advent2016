@@ -1,0 +1,6 @@
+hash: c54eccebd199f23682e170abdaf1267f83eebfee850f1eb4f85b5a66df884b25
+updated: 2016-12-16T10:27:25.845171875-08:00
+imports:
+- name: github.com/steakknife/hamming
+  version: 5ac3f73b8842df21423978fbbeb5166670f6f73e
+testImports: []

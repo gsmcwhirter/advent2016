@@ -26,3 +26,4 @@ _testmain.go
 adventofcode
 advent2016
 .vscode
+vendor

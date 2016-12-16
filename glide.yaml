@@ -1,2 +1,4 @@
-package: github.com/gsmcwhirter/adventofcode
-import: []
+package: github.com/gsmcwhirter/advent2016
+import:
+- package: github.com/steakknife/hamming
+  version: ^0.2.3
