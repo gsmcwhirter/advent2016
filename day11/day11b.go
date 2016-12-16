@@ -23,6 +23,8 @@ const (
 	ELEMENT_C
 	ELEMENT_D
 	ELEMENT_E
+	ELEMENT_F
+	ELEMENT_G
 )
 
 type Piece struct {
@@ -47,6 +49,12 @@ func (p *Piece) ToString() string {
 		elemString = "C"
 	case ELEMENT_D:
 		elemString = "D"
+	case ELEMENT_E:
+		elemString = "E"
+	case ELEMENT_F:
+		elemString = "F"
+	case ELEMENT_G:
+		elemString = "G"
 	}
 
 	switch p.Type {
@@ -94,6 +102,8 @@ func NewPieceSet() PieceSet {
 	ps.PiecesByElement[ELEMENT_C] = map[PieceType]Piece{}
 	ps.PiecesByElement[ELEMENT_D] = map[PieceType]Piece{}
 	ps.PiecesByElement[ELEMENT_E] = map[PieceType]Piece{}
+	ps.PiecesByElement[ELEMENT_F] = map[PieceType]Piece{}
+	ps.PiecesByElement[ELEMENT_G] = map[PieceType]Piece{}
 
 	return ps
 }
@@ -246,6 +256,8 @@ func NewState(floors int) State {
 			ELEMENT_C,
 			ELEMENT_D,
 			ELEMENT_E,
+			ELEMENT_F,
+			ELEMENT_G,
 		},
 		[]Move{},
 		map[Element]PairLocation{},
@@ -646,7 +658,7 @@ func ParseDataString(dat string) State {
 	state := NewState(4)
 
 	elementsMap := map[string]int{}
-	elements := []Element{ELEMENT_A, ELEMENT_B, ELEMENT_C, ELEMENT_D, ELEMENT_E}
+	elements := []Element{ELEMENT_A, ELEMENT_B, ELEMENT_C, ELEMENT_D, ELEMENT_E, ELEMENT_F, ELEMENT_G}
 	nextElement := 0
 
 	generatorRegex := regexp.MustCompile("a ([^\\s]+) generator")
