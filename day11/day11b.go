@@ -734,11 +734,11 @@ func LoadData(filename string) State {
 func RunPartA(filename string) {
 	startState := LoadData(filename)
 
-	// startState.Print()
-
 	BFS(startState)
 }
 
 func RunPartB(filename string) {
+	startState := LoadData(filename)
 
+	BFS(startState)
 }
