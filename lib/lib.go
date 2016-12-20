@@ -35,6 +35,22 @@ func IntMin(a int, b int) int {
 	return b
 }
 
+func UInt32Max(a uint32, b uint32) uint32 {
+	if a >= b {
+		return a
+	}
+
+	return b
+}
+
+func UInt32Min(a uint32, b uint32) uint32 {
+	if a <= b {
+		return a
+	}
+
+	return b
+}
+
 func IntAbs(val int) int {
 	return int(math.Abs(float64(val)))
 }
