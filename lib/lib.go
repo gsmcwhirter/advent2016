@@ -19,6 +19,15 @@ func ReadFileData(filename string) string {
 	return string(dat)
 }
 
+// IntMod is to make up for the verison of % that go ships... BOOOOOOOOOOOOO!!!!!!
+func IntMod(a, b int) int {
+	r := a % b
+	if r < 0 {
+		r += b
+	}
+	return r
+}
+
 func IntMax(a int, b int) int {
 	if a >= b {
 		return a
